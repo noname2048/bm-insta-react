@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Post from "./Post";
+import logo from "./instagram-logo.png";
+import { Button } from "@mui/material";
 
 const BASE_URL = "http://localhost:8000";
 
 function App() {
   const [posts, setPosts] = useState([]);
+  const [openSignIn, setOpenSignIn] = useState(false);
+  const [openSignUp, setOpenSignUp] = useState(false);
 
   useEffect(() => {
     fetch(BASE_URL + "/post/all")
@@ -41,10 +45,20 @@ function App() {
   }, []);
 
   return (
-    <div className="app_posts">
-      {posts.map((post) => (
-        <Post post={post} key={post.id} />
-      ))}
+    <div className="app">
+      <div className="app_header">
+        <img src={logo} alt="Instagram" className="app_headerImage" />
+        <div>
+          <Button onClick={() => setOpenSignIn(true)}>Login</Button>
+          <Button onClick={() => setOpenSignUp(true)}>Signup</Button>
+        </div>
+      </div>
+
+      <div className="app_posts">
+        {posts.map((post) => (
+          <Post post={post} key={post.id} />
+        ))}
+      </div>
     </div>
   );
 }
