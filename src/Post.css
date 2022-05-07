@@ -16,3 +16,27 @@
     border-top: 2px solid lightgray;
     border-bottom: 2px solid lightgray;
 }
+
+.post_text {
+    font-weight: normal;
+    padding: 20px;
+    border-bottom: 1px solid lightgray;
+}
+
+.post_comments {
+    padding: 20px;
+}
+
+.post_header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.post_headerInfo {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 10px;
+}

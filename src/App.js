@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Post from "./Post";
 
@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="app_posts">
       {posts.map((post) => (
-        <Post post={post} />
+        <Post post={post} key={post.id} />
       ))}
     </div>
   );
