@@ -16,9 +16,9 @@ function Post({ post }) {
     }
   }, []);
 
-  // useEffect(() => {
-  //   setComments(post.comments);
-  // }, []);
+  useEffect(() => {
+    setComments(post.comments);
+  }, []);
 
   return (
     <div className="post">
