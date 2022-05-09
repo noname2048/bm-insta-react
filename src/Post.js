@@ -32,8 +32,8 @@ function Post({ post }) {
       <img className="post_image" src={imageUrl} alt="" />
       <h4 className="post_text">{post.caption}</h4>
       <div className="post_comments">
-        {comments.map((comment) => (
-          <p>
+        {comments.map((comment, idx) => (
+          <p key={comment.id || idx}>
             <strong>{comment.username}:</strong> {comment.text}
           </p>
         ))}
