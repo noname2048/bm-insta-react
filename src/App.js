@@ -38,6 +38,10 @@ function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [authToken, setAuthToken] = useState(null);
+  const [authTokenType, setAuthTokenType] = useState(null);
+  const [userId, setUserId] = useState("");
+
   useEffect(() => {
     fetch(BASE_URL + "/post/all")
       .then((response) => {
@@ -71,7 +75,37 @@ function App() {
       });
   }, []);
 
-  const signIn = (event) => {};
+  const signIn = (event) => {
+    event.preventDefault();
+
+    let formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+    const requestOption = {
+      method: "POST",
+      body: formData,
+    };
+    fetch(BASE_URL + "/login", requestOption)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .then((data) => {
+        // console.log(data);
+        setAuthToken(data.access_token);
+        setAuthTokenType(data.token_type);
+        setUserId(data.user_id);
+        setUsername(data.username);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error);
+      });
+
+    setOpenSignIn(false);
+  };
 
   return (
     <div className="app">
