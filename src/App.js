@@ -103,7 +103,7 @@ function App() {
 
   const signIn = (event) => {
     console.log("signin submit");
-    event.preventDefault();
+    event?.preventDefault();
 
     let formData = new FormData();
     formData.append("username", username);
@@ -156,7 +156,7 @@ function App() {
       body: jsonString,
     };
 
-    fetch(BASE_URL + "user/", requestOption)
+    fetch(BASE_URL + "/user", requestOption)
       .then((response) => {
         if (response.ok) return response.json();
         else {
@@ -165,6 +165,7 @@ function App() {
       })
       .then((data) => {
         // console.log(data);
+        signIn();
       })
       .catch((error) => {
         console.log(error);
@@ -256,8 +257,24 @@ function App() {
           <Button onClick={() => signOut()}>Logout</Button>
         ) : (
           <div>
-            <Button onClick={() => setOpenSignIn(true)}>Login</Button>
-            <Button onClick={() => setOpenSignUp(true)}>Signup</Button>
+            <Button
+              onClick={() => {
+                setPassword("");
+                setOpenSignIn(true);
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => {
+                setUsername("");
+                setEmail("");
+                setPassword("");
+                setOpenSignUp(true);
+              }}
+            >
+              Signup
+            </Button>
           </div>
         )}
       </div>
