@@ -4,7 +4,7 @@ import { Avatar, Button } from "@mui/material";
 
 const BASE_URL = "http://localhost:8000";
 
-function Post({ post, authToken, authTokenType }) {
+function Post({ post, authToken, authTokenType, username }) {
   const [imageUrl, setImageUrl] = useState("");
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState();
@@ -41,7 +41,36 @@ function Post({ post, authToken, authTokenType }) {
       });
   };
 
-  const postComment = (event) => {};
+  const postComment = (event) => {
+    event?.preventDefault();
+    const jsonString = JSON.stringify({
+      username: username,
+      text: newComment,
+      post_id: post.id,
+    });
+    const requestOption = {
+      method: "POST",
+      headers: new Headers({
+        Authorization: authTokenType + " " + authToken,
+        "Content-Type": "application/json",
+      }),
+      body: jsonString,
+    };
+
+    fetch(BASE_URL + "/comment", requestOption)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setNewComment("");
+      });
+  };
 
   return (
     <div className="post">
@@ -78,7 +107,7 @@ function Post({ post, authToken, authTokenType }) {
             className="post_button"
             type="submit"
             disabled={!newComment}
-            onClikc={postComment}
+            onClick={postComment}
           >
             Post
           </button>

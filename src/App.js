@@ -287,6 +287,7 @@ function App() {
             key={post.id}
             authToken={authToken}
             authTokenType={authTokenType}
+            username={username}
           />
         ))}
       </div>
