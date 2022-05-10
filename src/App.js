@@ -4,6 +4,7 @@ import Post from "./Post";
 import logo from "./instagram-logo.png";
 import { Button, Modal, Input, Box } from "@mui/material";
 // import { makeStyles } from "@mui/styles";
+import ImageUpload from "./ImageUpload";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -284,6 +285,8 @@ function App() {
           <Post post={post} key={post.id} />
         ))}
       </div>
+
+      {authToken ? <ImageUpload /> : <h3>you need to login to upload</h3>}
     </div>
   );
 }
