@@ -35,18 +35,52 @@ function App() {
   const [openSignIn, setOpenSignIn] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
   const [modalStyle, setModalStyle] = useState(getModalStyle);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(
+    () => window.localStorage.getItem("username") ?? "",
+  );
   const [password, setPassword] = useState("");
 
-  const [authToken, setAuthToken] = useState(null);
-  const [authTokenType, setAuthTokenType] = useState(null);
-  const [userId, setUserId] = useState("");
+  const [authToken, setAuthToken] = useState(
+    window.localStorage.getItem("authToken"),
+  );
+  const [authTokenType, setAuthTokenType] = useState(
+    window.localStorage.getItem("authTokenType"),
+  );
+  const [userId, setUserId] = useState(window.localStorage.getItem("userId"));
+
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
-    setAuthToken(window.localStorage.getItem("authToken"));
-    setAuthTokenType(window.localStorage.getItem("authTokenType"));
-    setUsername(window.localStorage.getItem("username"));
-    setUserId(window.localStorage.getItem("userId"));
+    fetch(BASE_URL + "/post/all")
+      .then((response) => {
+        const json = response.json();
+        // console.log(json);
+        if (response.ok) {
+          return json;
+        }
+        throw response;
+      })
+      .then((data) => {
+        const result = data.sort((a, b) => {
+          const t_a = a.timestamp.split(/[-T:]/);
+          const t_b = b.timestamp.split(/[-T:]/);
+          const d_a = new Date(
+            Date.UTC(t_a[0], t_a[1] - 1, t_a[2], t_a[3], t_a[4], t_a[5]),
+          );
+          const d_b = new Date(
+            Date.UTC(t_b[0], t_b[1] - 1, t_b[2], t_b[3], t_b[4], t_b[5]),
+          );
+          return d_b - d_a;
+        });
+        return result;
+      })
+      .then((data) => {
+        setPosts(data);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error);
+      });
   }, []);
 
   useEffect(() => {
@@ -67,40 +101,8 @@ function App() {
       : window.localStorage.removeItem("userId");
   }, [authToken, authTokenType, userId]);
 
-  useEffect(() => {
-    fetch(BASE_URL + "/post/all")
-      .then((response) => {
-        const json = response.json();
-        console.log(json);
-        if (response.ok) {
-          return json;
-        }
-        throw response;
-      })
-      .then((data) => {
-        const result = data.sort((a, b) => {
-          const t_a = a.timestamp.split(/[-T:]/);
-          const t_b = b.timestamp.split(/[-T:]/);
-          const d_a = new Date(
-            Date.UTC(t_a[0], t_a[1] - 1, t_a[2], t_a[3], t_a[4], t_a[5])
-          );
-          const d_b = new Date(
-            Date.UTC(t_b[0], t_b[1] - 1, t_b[2], t_b[3], t_b[4], t_b[5])
-          );
-          return d_b - d_a;
-        });
-        return result;
-      })
-      .then((data) => {
-        setPosts(data);
-      })
-      .catch((error) => {
-        console.log(error);
-        alert(error);
-      });
-  }, []);
-
   const signIn = (event) => {
+    console.log("signin submit");
     event.preventDefault();
 
     let formData = new FormData();
@@ -139,6 +141,39 @@ function App() {
     setUsername("");
   };
 
+  const signUp = (event) => {
+    event.preventDefault();
+
+    const jsonString = JSON.stringify({
+      username: username,
+      email: email,
+      password: password,
+    });
+
+    const requestOption = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: jsonString,
+    };
+
+    fetch(BASE_URL + "user/", requestOption)
+      .then((response) => {
+        if (response.ok) return response.json();
+        else {
+          throw response;
+        }
+      })
+      .then((data) => {
+        // console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error);
+      });
+
+    setOpenSignUp(false);
+  };
+
   return (
     <div className="app">
       <Modal open={openSignIn} onClose={() => setOpenSignIn(false)}>
@@ -171,6 +206,46 @@ function App() {
             />
             <Button type="submit" onClick={signIn}>
               Login
+            </Button>
+          </form>
+        </Box>
+      </Modal>
+      <Modal open={openSignUp} onClose={() => setOpenSignUp(false)}>
+        <Box
+          style={modalStyle}
+          sx={{
+            bgcolor: "background.paper",
+            position: "absolute",
+            width: "400px",
+            border: "2px solid #000",
+            boxShadow: (theme) => theme.shadows[5],
+            padding: (theme) => theme.spacing(2, 4, 3),
+          }}
+        >
+          <form className="app_signin">
+            <center>
+              <img src={logo} alt="Instagram" className="app_headerImage" />
+            </center>
+            <Input
+              placeholder="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Input
+              placeholder="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button type="submit" onClick={signUp}>
+              Sign up
             </Button>
           </form>
         </Box>
