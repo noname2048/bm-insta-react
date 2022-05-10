@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@mui/material";
 import "./ImageUpload.css";
 
-function ImageUpload() {
+const BASE_URL = "http://localhost:8000";
+
+function ImageUpload({ authToken, authTokenType, userId }) {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
 
@@ -11,7 +13,76 @@ function ImageUpload() {
       setImage(e.target.files[0]);
     }
   };
-  const handleUpload = () => {};
+
+  const handleUpload = (e) => {
+    e?.preventDefault();
+
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const requestOption = {
+      method: "POST",
+      headers: new Headers({
+        Authorization: authTokenType + " " + authToken,
+      }),
+      body: formData,
+    };
+
+    fetch(BASE_URL + "/post/image", requestOption)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .then((data) => {
+        console.log(data);
+        createPost(data.filename);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setCaption("");
+        setImage(null);
+        document.getElementById("fileInput").value = null;
+      });
+  };
+
+  const createPost = (imageUrl) => {
+    console.log(`invoke createPost with URL ${imageUrl}`);
+    const jsonString = JSON.stringify({
+      image_url: imageUrl,
+      image_url_type: "relative",
+      caption: caption,
+      creator_id: userId,
+    });
+
+    const requestOption = {
+      method: "POST",
+      headers: new Headers({
+        Authorization: authTokenType + " " + authToken,
+        "Content-Type": "application/json",
+      }),
+      body: jsonString,
+    };
+
+    fetch(BASE_URL + "/post", requestOption)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .then((data) => {
+        window.location.reload();
+        // window.scroll(0, 0);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="imageupload">
       <input
