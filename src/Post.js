@@ -64,11 +64,31 @@ function Post({ post, authToken, authTokenType, username }) {
         }
         throw response;
       })
+      .then((data) => {
+        fetchComments();
+      })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
         setNewComment("");
+      });
+  };
+
+  const fetchComments = () => {
+    fetch(BASE_URL + "/comment/all/" + post.id)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .then((data) => {
+        console.log("retreive");
+        setComments(data);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
